@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyRead AI | Document Analyzer</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="/">EasyRead <span>AI</span></a>
+        <span class="tagline">Intelligent Document Analysis</span>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <p class="eyebrow">YOUR SMART STUDY ASSISTANT</p>
+            <h1>Understand documents <span>faster.</span></h1>
+            <p class="subtitle">
+                Upload a PDF or Word document to discover its key concepts
+                and generate a concise, extractive summary.
+            </p>
+        </section>
+
+        <section class="upload-card">
+            <form method="POST" enctype="multipart/form-data">
+                <label for="document" class="upload-label">
+                    Choose a document
+                </label>
+                <input id="document" type="file" name="document"
+                       accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                       required>
+                <p class="hint">
+                    PDF or Word (.docx) · Maximum size: 10 MB.
+                    Scanned PDFs without selectable text are not supported.
+                </p>
+                <button type="submit">Analyze document →</button>
+            </form>
+        </section>
+
+        {% if error %}
+        <div class="alert" role="alert">{{ error }}</div>
+        {% endif %}
+
+        {% if result %}
+        <section class="results">
+            <div class="document-heading">
+                <div>
+                    <p class="eyebrow">ANALYSIS COMPLETE</p>
+                    <h2>{{ result.filename }}</h2>
+                </div>
+                <span class="status">Processed</span>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <span>Pages</span>
+                    <strong>
+                        {{ result.page_count if result.page_count is not none else "—" }}
+                    </strong>
+                </div>
+                <div class="stat">
+                    <span>Words extracted</span>
+                    <strong>{{ result.word_count }}</strong>
+                </div>
+                <div class="stat">
+                    <span>Keywords found</span>
+                    <strong>{{ result.keywords|length }}</strong>
+                </div>
+            </div>
+
+            <article class="result-card">
+                <h2>Document summary</h2>
+                <p class="description">
+                    The main points, selected from the document and kept in
+                    reading order.
+                </p>
+                <ol class="summary-points">
+                    {% for point in result.summary %}
+                    <li>{{ point }}</li>
+                    {% else %}
+                    <li>No summary could be generated from the extracted text.</li>
+                    {% endfor %}
+                </ol>
+            </article>
+
+            <article class="result-card">
+                <h2>Important keywords</h2>
+                <p class="description">Ranked by their TF-IDF scores.</p>
+                <div class="keywords">
+                    {% for item in result.keywords %}
+                    <span class="keyword">{{ item.word }}</span>
+                    {% else %}
+                    <p>No keywords could be extracted.</p>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <details class="result-card">
+                <summary>View extracted text</summary>
+                <pre class="extracted-text">{{ result.text_preview }}</pre>
+            </details>
+        </section>
+        {% endif %}
+
+        <footer>
+            EasyRead AI · Hybrid ML/NLP + Generative AI project
+        </footer>
+    </main>
+</body>
+</html>
+```
